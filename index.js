@@ -2,6 +2,8 @@
 // const Intern = require('./lib/Intern');
 // const Engineer = require('./lib/Engineer');
 // const Manager = require('./lib/Manager');
+// const fs = require('fs')
+const generatePage = require('./src/page-template')
 const inquirer = require('inquirer');
 
 const promptManager = () =>{
@@ -116,7 +118,8 @@ const promptEngineer = () =>{
                     }
                 },
          },
-    ]);
+    ])
+    .then(promptContinue);
 }
 const promptIntern = () =>{
     return inquirer
@@ -173,7 +176,8 @@ const promptIntern = () =>{
                     }
                 },
          },
-    ]);
+    ])
+    .then(promptContinue);
 }
 
 const promptContinue = () =>{
@@ -181,11 +185,21 @@ const promptContinue = () =>{
         .prompt([
             {
                 name: 'EngineerOrIntern', 
-                type: 'checkbox',
-                choices: ['Engineer', 'Intern', 'Team Assembled'],
+                type: 'list',
+                choices: ['Engineer', 'Intern', 'Finish/Team Assembled'],
                 message: "Please choose to add an Engineer, Intern or choose Team Assembled if you are finished",
             }
-        ]);
+        ])
+        .then(EngineerOrIntern => {
+            console.log(EngineerOrIntern)
+            if(EngineerOrIntern['EngineerOrIntern'] === 'Engineer'){
+                promptEngineer(); 
+            } else if (EngineerOrIntern['EngineerOrIntern'] === 'Intern') {
+                promptIntern();
+            } else {
+                 return;
+            }
+        });
 }
 
 
