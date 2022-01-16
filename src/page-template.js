@@ -105,7 +105,7 @@ module.exports = teamArr => {
         </h1>   
       </div>
     </header>
-    <main class="container my-5 align-center text-center">Your Team</main>
+    <main class="container my-5 align-center text-center"></main>
     <div class ="container align-center d-flex flex-row justify-content-between">
     ${generateTeam(teamArr)}
     </div>
