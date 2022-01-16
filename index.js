@@ -1,16 +1,19 @@
 // const Employee = require('./lib/Employee');
-// const Intern = require('./lib/Intern');
-// const Engineer = require('./lib/Engineer');
-// const Manager = require('./lib/Manager');
-// const fs = require('fs')
+const Intern = require('./lib/Intern');
+const Engineer = require('./lib/Engineer');
+const Manager = require('./lib/Manager');
+const fs = require('fs')
 const generatePage = require('./src/page-template')
 const inquirer = require('inquirer');
+const { engine } = require('express/lib/application');
+
+const teamArr = []
 
 const promptManager = () =>{
     return inquirer
         .prompt([
             {
-                name: 'Name', 
+                name: 'name', 
                 type: 'input',
                 message: "Enter your manager's name",
                 validate: nameInput =>{
@@ -23,7 +26,7 @@ const promptManager = () =>{
                 }
             },  
             {
-                name: 'ID', 
+                name: 'id', 
                 type: 'input',
                 message: "Enter your manager's ID",
                 validate: idInput =>{
@@ -36,7 +39,7 @@ const promptManager = () =>{
                 }
             },
             {
-            name: 'Email', 
+            name: 'email', 
             type: 'input',
             message: "Enter your manager's email",
             validate: emailInput =>{
@@ -49,7 +52,7 @@ const promptManager = () =>{
             }
         },
             {
-                name: 'Office Number', 
+                name: 'officeNumber', 
                 type: 'input',
                 message: "Enter your manager's office number",
                 validate: officeNumberInput =>{
@@ -67,7 +70,7 @@ const promptEngineer = () =>{
     return inquirer
         .prompt([
             {
-                name: 'Name', 
+                name: 'name', 
                 type: 'input',
                 message: "Enter your engineer's name",
                 validate: nameInput =>{
@@ -80,7 +83,7 @@ const promptEngineer = () =>{
                 }
             },  
             {
-                name: 'ID', 
+                name: 'id', 
                 type: 'input',
                 message: "Enter your engineer's ID",
                 validate: idInput =>{
@@ -93,7 +96,7 @@ const promptEngineer = () =>{
                 }
             },
             {
-            name: 'Email', 
+            name: 'email', 
             type: 'input',
             message: "Enter your engineer's email",
             validate: emailInput =>{
@@ -106,7 +109,7 @@ const promptEngineer = () =>{
             }
         },
             {
-                name: 'GitHub', 
+                name: 'github', 
                 type: 'input',
                 message: "Enter your engineer's GitHub username",
                 validate: GitHub =>{
@@ -119,13 +122,12 @@ const promptEngineer = () =>{
                 },
          },
     ])
-    .then(promptContinue);
 }
 const promptIntern = () =>{
     return inquirer
         .prompt([
             {
-                name: 'Name', 
+                name: 'name', 
                 type: 'input',
                 message: "Enter your intern's name",
                 validate: nameInput =>{
@@ -138,7 +140,7 @@ const promptIntern = () =>{
                 }
             },  
             {
-                name: 'ID', 
+                name: 'id', 
                 type: 'input',
                 message: "Enter your intern's ID",
                 validate: idInput =>{
@@ -151,7 +153,7 @@ const promptIntern = () =>{
                 }
             },
             {
-            name: 'Email', 
+            name: 'email', 
             type: 'input',
             message: "Enter your intern's email",
             validate: emailInput =>{
@@ -164,7 +166,7 @@ const promptIntern = () =>{
             }
         },
             {
-                name: 'GitHub', 
+                name: 'school', 
                 type: 'input',
                 message: "Enter your intern's school name",
                 validate: school =>{
@@ -177,7 +179,6 @@ const promptIntern = () =>{
                 },
          },
     ])
-    .then(promptContinue);
 }
 
 const promptContinue = () =>{
@@ -191,12 +192,23 @@ const promptContinue = () =>{
             }
         ])
         .then(EngineerOrIntern => {
-            console.log(EngineerOrIntern)
             if(EngineerOrIntern['EngineerOrIntern'] === 'Engineer'){
-                promptEngineer(); 
+                promptEngineer()
+                .then(engineer =>{
+                    var newEngineer = new Engineer(engineer.name, engineer.id, engineer.email, engineer.github);
+                    teamArr.push(newEngineer);
+                promptContinue();    
+                })
             } else if (EngineerOrIntern['EngineerOrIntern'] === 'Intern') {
-                promptIntern();
+                promptIntern()
+                .then(intern =>{
+                    var newIntern = new Intern(intern.name, intern.id, intern.email,intern.school);
+                    teamArr.push(newIntern);
+                promptContinue();
+                })
             } else {
+                 var html = generatePage(teamArr);
+                 fs.writeFileSync('./dist/index.html', html, 'utf-8')
                  return;
             }
         });
@@ -204,8 +216,11 @@ const promptContinue = () =>{
 
 
 promptManager()
-    .then(teamArr => console.log(teamArr))
-    .then(promptContinue);
+    .then(manager => {
+        var newManager = new Manager(manager.name, manager.id, manager.email, manager.officeNumber);
+        teamArr.push(newManager);
+    })
+    .then(promptContinue)
 
 // prompt user to enter Manager info
 
